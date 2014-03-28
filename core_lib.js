@@ -19,7 +19,7 @@ var getProcess = function(key)
 
     return null;
 };
-
+//&begin [pingTimeout, timeout]
 var timeoutProcessSetPing = function (process)
 {
     for (var i = 0; i < processes.length; i++)
@@ -43,7 +43,8 @@ var timeoutProcessClearPing = function (process)
         }
     }
 };
-
+//&end [pingTimeout, timeout]
+//&begin [inactivityTimeout, timeout]
 var timeoutProcessSetInactivity = function(process)
 {
     for (var i = 0; i < processes.length; i++)
@@ -67,7 +68,7 @@ var timeoutProcessClearInactivity = function (process)
         }
     }
 };
-
+//&end [inactivityTimeout, timeout]
 var getBackend = function (backendId)
 {
     for (var j = 0; j < backendConfig.backends.length; j++)
@@ -113,7 +114,7 @@ var addProcess = function (process)
     processRemoveOlder(process.windowKey);
     processes.push(process);
 };
-
+//&begin [pingTimeout, timeout]
 var pingTimeoutFunc = function (process)
 {
     logSpecific("Error: Ping Timeout", process.windowKey);
@@ -122,7 +123,8 @@ var pingTimeoutFunc = function (process)
     process.toRemoveCompletely = true;   
     cleanProcesses();
 };
-
+//&end [pingTimeout, timeout]
+//&begin [inactivityTimeout, timeout]
 var inactivityTimeoutFunc = function (process)
 {
     logSpecific("Error: Inactivity Timeout", process.windowKey);
@@ -131,7 +133,7 @@ var inactivityTimeoutFunc = function (process)
     process.toRemoveCompletely = true;   
     cleanProcesses();
 };
-
+//&end [inactivityTimeout, timeout]
 var cleanProcesses = function ()
 {
     var i = 0;
@@ -166,7 +168,7 @@ var killProcessTree = function(process)
     process.clafer_compiler = null;
     logSpecific("Killing the process tree...", process.windowKey);                
 };
-
+//&begin checkingDependencies
 var dependencies = [];
 var dependencyCount = 0;
 
@@ -214,7 +216,7 @@ var dependency_ok = function(callback)
         callback();
     }
 };
-
+//&end checkingDependencies
 var killProcessIfExists = function(tool)
 {
     if (tool)
@@ -253,7 +255,7 @@ var logNormal = function(message)
     {
         console.log(message);
     };
-
+//&begin [cleanOldFiles] 
 var cleanupOldFiles = function (dir) {
         logNormal("Cleaning temporary files...");                    
         //cleanup old files
@@ -314,7 +316,7 @@ var finishCleanup = function (dir, results)
             }
         });
     };
-
+//&end [cleanOldFiles] 
 var escapeJSON = function (unsafe) 
     {
         return unsafe.replace(/[\\]/g, '\\\\')

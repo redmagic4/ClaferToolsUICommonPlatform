@@ -26,11 +26,11 @@ function Control(host, settings)
     this.settings = settings;
     this.title = this.settings.title;
     
-    this.requestTimeout = 60000; // what is the timeout for response after sending a file
-    this.pollingTimeout = 60000;  // what is the timeout when polling
-    this.pollingDelay = 700;    // how often to send requests (poll) for updates
-    this.pollingTimeoutObject = null;
-    this.toCancel = false;
+    this.requestTimeout = 60000; // what is the timeout for response after sending a file &line [timeout]
+    this.pollingTimeout = 60000;  // what is the timeout when polling &line [polling, timeout]
+    this.pollingDelay = 700;    // how often to send requests (poll) for updates &line [polling]
+    this.pollingTimeoutObject = null;//&line [polling, timeout]
+    this.toCancel = false;//&line cancellation
 
     this.width = this.settings.layout.width;
     this.height = this.settings.layout.height;
@@ -56,7 +56,7 @@ Control.method("getInitContent", function(){
     ret += '<fieldset id="backendButtonsFieldset"><div id="backendButtons"></div></fieldset>';
 
     ret += '<div style="height:5px;"></div><fieldset id="scopeControl">';
-
+	//&begin [scopeInteraction]
     ret += '<legend>Scope Settings</legend>';  
     ret += '<table width="100%" border="0" cellspacing="0" cellpadding="0">'; 
 
@@ -66,7 +66,7 @@ Control.method("getInitContent", function(){
     ret += '<tr><td style="padding-left:5px">Default:</td><td><input type="text" class="scopeInput" title="Enter the scope (an integer from 0 up to a number the backend can handle)" size="2" value="1" id="globalScopeValue"/><button id="setGlobalScope" title="Set the global (or default) scope">Set</button></td>' + saveLink + '</tr>';
     ret += '<tr><td style="padding-left:5px">Integers:</td><td colspan="2"><input type="text" class="scopeInput" size="2" value="-128" id="intLowScopeValue" title="Enter the lower bound for unknown integers (can be negative)"/> to <input type="text" class="scopeInput" size="2" value="127" id="intHighScopeValue" title="Enter the upper bound for unknown integers (normally positive)"/><button id="setIntScope" title="Set the selected scope for integers">Set</button></td></tr>';
     ret += '<tr><td style="padding-left:5px">Clafers:</td><td colspan="2"><input type="text" style="width:120px;" id="individualClafer" placeholder="Clafer name(s)" title="Enter the clafer name, namespace, path or choose ones from a drop down, depending on the backend"></input>';
-
+	//&end [scopeInteraction]
     ret += '<span id="ClaferListCont" style="width:30px"></span>';
     ret += '<input type="text" size="2" value="1" class="scopeInput" id="individualScopeValue" title="Enter the scope value (an integer from 0 up to a number the backend can handle)"/>';
 
@@ -165,7 +165,7 @@ Control.method("runStopClick", function(){
         $("#ControlForm").submit();
     }
 });
-
+//&begin [scopeInteraction]
 Control.method("setGlobalScopeClick", function(){
     $("#ControlOp").val("setGlobalScope");
     $("#ControlOpArg1").val($ ("#globalScopeValue").val());
@@ -185,7 +185,7 @@ Control.method("setIntScopeClick", function(){
     $("#ControlOpArg2").val($ ("#intHighScopeValue").val());
 //    $("#ControlForm").submit();
 });
-
+//&end [scopeInteraction]
 Control.method("enableRuntimeControls", function(){
     $("#" + $( "#backend option:selected" ).val() + "_buttons").children("button").removeAttr("disabled");
     $("#RunStop").val("Stop");
@@ -287,7 +287,7 @@ Control.method("handleError", function(response, statusText, xhr)  {
     
 });
 
-
+//&begin [polling]
 Control.method("onPoll", function(responseObject)
 {
 //    console.log(responseObject);
@@ -338,6 +338,7 @@ Control.method("poll", function()
 
     $.ajax(options);
 });
+//&end [polling]
 
 Control.method("updateClaferList", function(jsonList){
 

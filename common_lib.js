@@ -7,7 +7,7 @@ var core = require("./core_lib");
 var formatConfig = require('./../Formats/formats.json');
 var spawn = require('child_process').spawn;    
 var ROOT = __dirname.substring(0, __dirname.length - "/commons".length);
-
+//&begin fileUpload
 var handleUploads = function(req, res, next, finalCallback)
 	{
 
@@ -21,14 +21,15 @@ var handleUploads = function(req, res, next, finalCallback)
 	    var uploadedFilePath = "";
 	    
 		//check if client has either a file directly uploaded or a url location of a file
-	   	
+	  //&begin [urlUploading]
 	    if (req.body.exampleFlag == "1")
 	    {
+	    	//&begin selectionOfExamples
 	        if (req.body.exampleURL !== undefined && req.body.exampleURL !== "") // if example submitted
 	        {
 	            core.logSpecific(req.headers.host, req.body.windowKey);
 	            currentURL = "http://" + req.headers.host + "/Examples/" + req.body.exampleURL;                
-	        }
+	        }//&end selectionOfExamples
 	        else
 	        {
 	            core.logSpecific("No example submitted. Returning...", req.body.windowKey);
@@ -68,6 +69,7 @@ var handleUploads = function(req, res, next, finalCallback)
 	                res.end("no clafer file submitted");
 	                return;
 	            }
+	          //&begin handleEmptyFile
 	            var pre_content = fs.readFileSync(uploadedFilePath);
 	            if (pre_content.length == 0)
 	            {
@@ -75,10 +77,12 @@ var handleUploads = function(req, res, next, finalCallback)
 	                res.writeHead(200, { "Content-Type": "text/html"});
 	                res.end("no clafer file submitted");
 	                return;
-	            }        
+	            }         //&end handleEmptyFile  
 	        }
 		}
+	  //&end [urlUploading]
 	    else // (req.body.exampleFlag == "2") submitted a text
+	    	//&begin [uploadFromTextEditor]
 	    {    
 	        var i = 0;
 	        uploadedFilePath = req.body.windowKey;
@@ -103,7 +107,7 @@ var handleUploads = function(req, res, next, finalCallback)
 	        });
 
 	    }
-	    
+	    //&end [uploadFromTextEditor]
 	/* downloading the file, if required */ 
 
 	    if (currentURL != "")
@@ -171,7 +175,7 @@ var moveUploadedFile = function (req, res, next, uploadedFilePath, urlFile, call
 	    });
 	};
 
-
+//&begin [fileProcessing]
 var runClaferCompiler = function(key, specifiedArgs, genericArgs, onComplete)
 {
     var formatModeArgs = [];
@@ -235,7 +239,7 @@ var runClaferCompiler = function(key, specifiedArgs, genericArgs, onComplete)
 
             // it makes sense to get the compiled files for the models (e.g., HTML) 
             // that may show syntax errors
-
+          //&begin [multipleFormatOutput]
             var formats_for_process = [];
 
             for (var j = 0; j < formatConfig.formats.length; j++)
@@ -248,7 +252,7 @@ var runClaferCompiler = function(key, specifiedArgs, genericArgs, onComplete)
                 format.process = process;
                 formats_for_process.push(format);
             }
-
+          //&end [multipleFormatOutput]
             formats_for_process.forEach(function(item) 
             {
                 if (item.shows_compilation_errors || (item.process.compiler_code == 0))
@@ -259,6 +263,7 @@ var runClaferCompiler = function(key, specifiedArgs, genericArgs, onComplete)
                         obj.id = item.id;
                         obj.fileSuffix = item.file_suffix;
                         obj.displayElement = item.display_element;
+                      //&begin [compileErrorHandling]
                         if (err) // error reading HTML, maybe it is not really present, means a fatal compilation error
                         {
                             core.logSpecific('ERROR: Cannot read the compiled file.', key);
@@ -270,7 +275,7 @@ var runClaferCompiler = function(key, specifiedArgs, genericArgs, onComplete)
                             obj.message = "OK";
                             obj.result = file_contents.toString();
                         }
-
+                      //&end [compileErrorHandling]
                         item.process.compiled_formats.push(obj);
 
                         if (formats_for_process.length == item.process.compiled_formats.length)
@@ -297,6 +302,7 @@ var runClaferCompiler = function(key, specifiedArgs, genericArgs, onComplete)
     });
 
 };
-
+//&end [fileProcessing]
+//&end fileUpload
 module.exports.handleUploads = handleUploads;
 module.exports.runClaferCompiler = runClaferCompiler;

@@ -25,11 +25,11 @@ function Input(host, settings)
     this.settings = settings;
     this.title = this.settings.title;
 
-    this.requestTimeout = 60000; // what is the timeout for response after sending a file
-    this.pollingTimeout = 60000;  // what is the timeout when polling
-    this.pollingDelay = 700;    // how often to send requests (poll) for updates
-    this.pollingTimeoutObject = null;
-    this.toCancel = false;
+    this.requestTimeout = 60000; // what is the timeout for response after sending a file &line [timeout]
+    this.pollingTimeout = 60000;  // what is the timeout when polling &line [polling, timeout]
+    this.pollingDelay = 700;    // how often to send requests (poll) for updates &line [polling]
+    this.pollingTimeoutObject = null;//&line [polling, timeout]
+    this.toCancel = false;//&line cancellation
 
     this.width = this.settings.layout.width;
     this.height = this.settings.layout.height;
@@ -60,14 +60,14 @@ Input.method("onInitRendered", function()
     this.optimizeFlag = 1;
     this.addInstancesFlag = 1;
     this.previousData = null;
-    this.toCancel = false;
+    this.toCancel = false;//&line cancellation
 
-    $("#submitFile").click(this.submitFileCall.bind(this));
-    $("#submitExample").click(this.submitExampleCall.bind(this));
-    $("#submitText").click(this.submitTextCall.bind(this));    
-    $("#submitExample").attr("disabled", "disabled");
+    $("#submitFile").click(this.submitFileCall.bind(this));//&line selectionOfExamples
+    $("#submitExample").click(this.submitExampleCall.bind(this));//&line selectionOfExamples
+    $("#submitText").click(this.submitTextCall.bind(this));  
+    $("#submitExample").attr("disabled", "disabled");//&line selectionOfExamples
 
-    $("#submitFile").attr("disabled", "disabled");
+    $("#submitFile").attr("disabled", "disabled");//&line selectionOfExamples
 
     $("#myform [type='file']").change(this.inputChange.bind(this));
     $("#exampleURL").change(this.exampleChange.bind(this));
@@ -76,9 +76,9 @@ Input.method("onInitRendered", function()
 
     var options = new Object();
     options.beforeSubmit = this.beginQuery.bind(this);
-    options.success = this.fileSent.bind(this);
-    options.error = this.handleError.bind(this);
-    options.timeout = this.requestTimeout;
+    options.success = this.fileSent.bind(this);//&line polling
+    options.error = this.handleError.bind(this);//&line handleError
+    options.timeout = this.requestTimeout;// &line timeout
 
     $('#myform').ajaxForm(options); 
 
@@ -94,26 +94,26 @@ Input.method("onInitRendered", function()
 //    optionsForFile.error = this.handleError.bind(this);
 //    optionsForFile.timeout = this.requestTimeout;
 //    $('#saveSourceForm').ajaxForm(optionsForFile); 
-
+	//&begin [claferTextEditor]
     this.editor = ace.edit("clafer_editor");
     this.editor.setTheme("ace/theme/eclipse");
     var ClaferMode = require("ace/mode/clafer").Mode;
     this.editor.getSession().setMode(new ClaferMode());
     this.editor.setShowPrintMargin(false);
-
+	//&end [claferTextEditor]
     // $('#myform').submit(); MOVED TO another location
 });
-
 /*
  * Cancel request
  */
-
+//$begin cancellation
 Input.method("cancelCall", function() 
 {
     $("#cancel").hide();
     $("#status_label").html("Cancelling...");
     this.toCancel = true;
 });
+//$end cancellation
 
 /*
  * Shows uploader and hides the form
@@ -128,7 +128,7 @@ Input.method("beginQuery", function(formData, jqForm, options) {
 
 	$("#load_area #myform").hide();
 	$("#load_area").append('<div id="preloader"><img id="preloader_img" src="/commons/Client/images/preloader.gif" alt="Loading..."/><span id="status_label">Loading and processing...</span><button id="cancel">Cancel</button></div>');	
-    $("#cancel").click(this.cancelCall.bind(this));
+    $("#cancel").click(this.cancelCall.bind(this));//&line [cancellation]
     this.host.findModule("mdControl").disableAll();
 
     return true; 
@@ -144,14 +144,16 @@ Input.method("endQuery", function()  {
 	return true;
 });
 
+//&begin [polling,instanceProcessing]
 Input.method("onPoll", function(responseObject)
 {
+	//&begin handleError
     if (!responseObject)
     {
         this.handleError(null, "empty_argument", null);
         return;
     }
-
+	//&end handleError
     this.settings.onPoll(this, responseObject);
 
     if (responseObject.message == "Working")
@@ -164,17 +166,17 @@ Input.method("onPoll", function(responseObject)
         this.endQuery();
     }
 });        
-
+//&end [instanceProcessing]
 Input.method("poll", function()
 {
     var options = new Object();
     options.url = "/poll";
     options.type = "post";
-    options.timeout = this.pollingTimeout;
+    options.timeout = this.pollingTimeout;//&line timeout
     if (!this.toCancel)
         options.data = {windowKey: this.host.key, command: "ping"};
     else
-        options.data = {windowKey: this.host.key, command: "cancel"};
+        options.data = {windowKey: this.host.key, command: "cancel"};//&line cancellation
     
     options.success = this.onPoll.bind(this);
     options.error = this.handleError.bind(this);
@@ -202,7 +204,8 @@ Input.method("fileSent", function(responseText, statusText, xhr, $form)  {
 //        this.setClaferModelHTML(this.host.findModule("mdCompiledFormats").lastModel);
     }
 });
-
+//&end polling
+	//&begin [handleError]
 Input.method("handleError", function(response, statusText, xhr)  { 
 	clearTimeout(this.pollingTimeoutObject);
 	var er = document.getElementById("error_overlay");
@@ -216,12 +219,12 @@ Input.method("handleError", function(response, statusText, xhr)  {
 	this.endQuery();
     
 });
-
+	//&end [handleError]
 Input.method("onSubmit", function(){
     if (this.pollingTimeoutObject)
         clearTimeout(this.pollingTimeoutObject);
 });
-
+//&begin selectionOfExamples
 Input.method("submitFileCall", function(){
 
     $("#exampleURL").val(null);
@@ -250,7 +253,7 @@ Input.method("exampleChange", function(){
  		$("#submitExample").attr("disabled", "disabled");       
     }
 });
-
+//&end selectionOfExamples
 Input.method("inputChange", function(){
 	var filename = $("#myform [type='file']").val();
     
@@ -279,12 +282,13 @@ Input.method("getInitContent", function()
 
     result += '<input type="hidden" name="claferFileURL" id="claferFileURL" value="' + this.host.claferFileURL + '">';
     result += '<input type="hidden" name="exampleFlag" id="exampleFlag" value="0">';
-    result += '<input type="hidden" id="windowKey" name="windowKey" value="' + this.host.key + '">';
+    result += '<input type="hidden" id="windowKey" name="windowKey" value="' + this.host.key + '">';//&line windowKey
     result += '<input id="claferText" name="claferText" type="hidden"/>';
 
     result += '<table width="100%" height="100%" cellspacing="0" cellpadding="0">';    
     result += '<tr height="1em">';
     result += '<td><input type="file" size="20" name="claferFile" id="claferFile" title="If you want to upload your clafer file, select one here "/></td>';
+	//&begin selectionOfExamples
     result += '<td width="60"><input id="submitFile" type="submit" value="' + this.settings.button_file_caption + '" title="' + this.settings.button_file_tooltip + '"/></td>';
     result += '<td width="160"><input id="loadExampleInEditor" type="checkbox" name="loadExampleInEditor" value="unchecked" title="If checked, the editor window below will be loaded with a file or an example submitted">Load into editor</input></td>';
     result += '</tr><tr height="1em">';
@@ -292,7 +296,7 @@ Input.method("getInitContent", function()
     
     result += '</select></td>';
     result += '<td><input id="submitExample" type="submit" value="' + this.settings.button_example_caption + '" title="' + this.settings.button_example_tooltip + '"></input></td>';
-
+	//&end selectionOfExamples
     result += '<td style="padding: 0px 2px 0px 2px; border-top: 2px groove threedface; border-left: 2px groove threedface">Scopes: <select id="ss" name="ss" title="Choose a scope computing strategy. Scopes are used for instantiation using bounded model checking">';
 
     result += '<option value="none" title="Disable scope computing strategy. All scopes are to be set to 1">Disabled</option>';
@@ -303,6 +307,7 @@ Input.method("getInitContent", function()
 
     result += '</tr><tr height="1em">';
     result += '<td style="border-top: 2px groove threedface;">';
+    //&begin [claferTextEditor]
     result += 'Or enter your model:</td>';
     result += '<td style="border-top: 2px groove threedface; "><input id="submitText" type="submit" value="' + this.settings.button_editor_caption + '" title="' + this.settings.button_editor_tooltip + '"/></td>';
 
@@ -315,7 +320,7 @@ Input.method("getInitContent", function()
     }
 
     result += '</tr><tr height="100%"><td style="height:100%;border-top: 2px groove threedface;' + padding + '" colspan = "3"><div id="clafer_editor" style="height:100%">';
-
+	//&end [claferTextEditor]
     result += '</div></td>';
 
     result += '</tr></table>';
