@@ -61,9 +61,9 @@ FeatureQualityMatrix.method("onDataLoaded", function(data){
 FeatureQualityMatrix.method("onRendered", function()
 {
 // Add circles to table headers
-    
+	//&begin automaticViewSizing
     $.resizeWindow(this.id, this.width, $("#comparison").height() + 80); // resize the table to fit everything
-
+  //&end automaticViewSizing
     this.addShapes();
 
 // Add search bar 
@@ -207,6 +207,7 @@ FeatureQualityMatrix.method("onRendered", function()
         i++;
         row = $("#r" + i);
     }
+  //&begin [expandCollapse]
     //  Add collapse buttons for features with children
     var instanceSuperClafer = this.instanceProcessor.getInstanceSuperClafer();
     var abstractClaferTree = this.processor.getAbstractClaferTree("/module/declaration/uniqueid", instanceSuperClafer);
@@ -232,6 +233,8 @@ FeatureQualityMatrix.method("onRendered", function()
                 }).css("cursor", "pointer");
             }
         }
+      //&end [expandCollapse]
+      //&begin [sortingByQuality,sorting]
 //  Add sorting to quality attributes
         else {
             $("#r" + i + " .td_abstract").append('<div id=sortText style="display:inline"></div>');
@@ -254,6 +257,8 @@ FeatureQualityMatrix.method("onRendered", function()
         i++;
         row = $("#r" + i);
     }
+  //&end [sortingByQuality,sorting]
+    //&begin [sortingByID,sorting]
 //  Add sorting by instance names (default);
     $("#r" + 0 + " .td_abstract").append('<div id=sortText style="display:inline"> \u25C0</div>');
     $("#r" + 0 + " .td_abstract").addClass('sortAsc');
@@ -270,6 +275,7 @@ FeatureQualityMatrix.method("onRendered", function()
         }
         that.rowSort($(this).text());
     }).css("cursor", "pointer");
+  //&end [sortingByID,sorting]
 // Selection of instances for analysis from top row of table
     var length = $("#r0").find(".td_instance").length;
     for(i=1; i<=length; i++){
@@ -487,7 +493,7 @@ FeatureQualityMatrix.method("toggleDistinct", function()
     this.scrollToSearch($("#search").val());
     return true;
 });
-
+//&begin [hottracking]
 //  Adds hot-tracking and highlighting for table and graph
 FeatureQualityMatrix.method("addHovering", function()
 {	
@@ -572,7 +578,7 @@ FeatureQualityMatrix.method("addHovering", function()
     );
 
 });
-
+//&end [hottracking]
 //makes instance red on graph, for actual selection function see onSelected(pid) in selector.js
 FeatureQualityMatrix.method("makePointsSelected", function (pid){;
     $("#mdFeatureQualityMatrix #th0_" + pid.substring(1)).find("text").css("fill", "Red");
@@ -582,7 +588,7 @@ FeatureQualityMatrix.method("makePointsSelected", function (pid){;
 FeatureQualityMatrix.method("makePointsDeselected", function (pid){
     $("#mdFeatureQualityMatrix #th0_" + pid.substring(1)).find("text").css("fill", "Black");
 });
-
+//&begin [searchBar]
 FeatureQualityMatrix.method("scrollToSearch", function (input){
     //method name is from before. doesn't actually scroll... hides rows not containing input.
     //You can search multiple strings by seperating them with a space or comma (or both)
@@ -630,7 +636,8 @@ FeatureQualityMatrix.method("scrollToSearch", function (input){
 */
 
 });
-
+//&end [searchBar]
+//&begin [sorting]
 // sorts instances in comparison table by either Instance numbers or quality values
 // gets passed the text of the row clicked
 FeatureQualityMatrix.method("rowSort", function(rowText){
@@ -685,7 +692,7 @@ FeatureQualityMatrix.method("rowSort", function(rowText){
         row = $("#comparison #r" + i);
     }
 });
-
+//&end [sorting]
 //adds proper shapes and svg fields to the headers in the comparison table
 FeatureQualityMatrix.method("addShapes", function(){
     var that = this;
@@ -739,7 +746,7 @@ FeatureQualityMatrix.method("addShapes", function(){
 
     });
 });
-
+//&begin [hottracking]
 //sets a shape to be rendered as a highlight
 FeatureQualityMatrix.method("highlight", function(obj){
     $(obj).attr("filter", "url(#blur)");
@@ -747,7 +754,7 @@ FeatureQualityMatrix.method("highlight", function(obj){
     $(obj).attr("stroke", "yellow");
     return obj;
 });
-
+//&end [hottracking]
 //returns crosshairs for the graph that intersect at coordinates (x,y)
 FeatureQualityMatrix.method("getCrosshairs", function(x, y){
     var NS="http://www.w3.org/2000/svg";

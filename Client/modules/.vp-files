@@ -6,3 +6,7 @@ md_control.js
 control
 md_output.js
 output
+md_feature_quality_matrix.js
+featureAndQualityMatrix
+md_goals.js
+objectives
