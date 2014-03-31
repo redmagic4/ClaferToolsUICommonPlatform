@@ -6,7 +6,5 @@ clafer_processor.js
 claferProcessor
 instance_processor.js instance_converter.js
 instanceProcessor
-selection_controller.js
-multipleSelection
 data_table.js table_visualizer.js
 dataTable
