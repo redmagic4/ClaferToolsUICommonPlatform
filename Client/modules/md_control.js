@@ -76,6 +76,8 @@ Control.method("getInitContent", function(){
    
     ret += '</form>';
 
+    var context = this;
+
     $.getJSON('/Backends/backends.json', 
         function(data)
         {
@@ -110,14 +112,14 @@ Control.method("getInitContent", function(){
 //                return false;
             });
 
-            $("#myform").submit();
+            context.host.loaded(context); // notify about getting fully loaded
 
         }
     ).error(function() 
         { 
             var options = '<option value="">(Could not load instance generators)</option>';
             $("#backend").html(options);
-            $("#myform").submit();
+            context.host.loaded(context); // notify about getting fully loaded
 
         });
 
@@ -276,7 +278,7 @@ Control.method("handleError", function(response, statusText, xhr)  {
     
     var er = document.getElementById("error_overlay");
     er.style.display = "block"; 
-    var caption = this.settings.onError(this, statusText, response.responseText);
+    var caption = this.settings.onError(this, statusText, response, xhr);
 
     document.getElementById("error_report").innerHTML = ('<span id="close_error" alt="close">Close Message</span><p>' + caption + "</p>");
     document.getElementById("close_error").onclick = function(){ 
