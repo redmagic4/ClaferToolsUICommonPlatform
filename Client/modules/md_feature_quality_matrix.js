@@ -97,7 +97,7 @@ FeatureQualityMatrix.method("onRendered", function()
         }
     }).css("cursor", "pointer");
 
-
+  //&begin [removeInstance]
     if (this.settings.buttonsForRemoval)
     {
     //  Add remove buttons to instances
@@ -122,6 +122,7 @@ FeatureQualityMatrix.method("onRendered", function()
             });
         }
     }
+  //&end [removeInstance]
 //************************* Most of the following is to get proper formatting on the table  *******************
 
 // Move headers into new div
@@ -857,7 +858,8 @@ FeatureQualityMatrix.method("getSVGSquare", function(cx, cy, r){
 FeatureQualityMatrix.method("changeConstraint", function (feature, require){
     this.settings.onConstraintChange(this, feature, require);
 });
-
+//&begin [removeInstance]
 FeatureQualityMatrix.method("removeInstance", function(instanceNum){
     this.settings.onInstanceRemove(this, instanceNum);
 })
+//&end [removeInstance]
