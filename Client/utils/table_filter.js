@@ -62,14 +62,14 @@ tableFilter.method("filterContent", function (){
  	for(i=0; i<this.closedFeatures.length; i++){
  		this.closeFeature(this.closedFeatures[i]);
  	}
-
+ 	//&begin [removeInstance]
  	//permanently hidden instances (removed)
  	if(this.permahidden != []){
 	 	for(i=0;i<this.permahidden.length;i++){
 	 		$(this.permahidden[i]).hide();
 	 	}
  	}
-
+ 	//&end [removeInstance]
  	this.host.scrollToSearch($("#search").val());
 });
 
@@ -95,7 +95,7 @@ tableFilter.method("hideRowByName", function (name){
 		}
 	}
 });
-
+//&begin [expandCollapse]
 tableFilter.method("closeFeature", function (feature){
     var instanceSuperClafer = this.instanceProcessor.getInstanceSuperClafer();
     var root = this.processor.getAbstractClaferTree("/module/declaration/uniqueid", instanceSuperClafer);	
@@ -114,7 +114,7 @@ tableFilter.method("hideChildren", function (node){
  		this.hideRowByName(node.subclafers[i].displayId);
  	}
 });
-
+//&end [expandCollapse]
 tableFilter.method("findNodeInTree", function (root, feature){
 	if (root.displayId === feature)
 		return root;
@@ -128,13 +128,13 @@ tableFilter.method("findNodeInTree", function (root, feature){
 		}
 	}
 });	
-
+//&begin [expandCollapse]
 tableFilter.method("openFeature", function (feature){
 	var index = this.closedFeatures.indexOf(feature);
 	this.closedFeatures.splice(index, 1);
 	this.filterContent();
 });
-
+//&end [expandCollapse]
 tableFilter.method("resetFilters", function (filters, permahidden){
 	if(filters != []){
 		for (var i=1;i<this.rows.length;i++){
@@ -184,7 +184,7 @@ tableFilter.method("cleanFilters", function (){
  		}
  	}
 });
-
+//&begin [removeInstance]
 tableFilter.method("removeInstance", function(instanceNum){
 	$("#th0_" + instanceNum).hide();
 	this.permahidden.push("#th0_" + instanceNum);
@@ -196,3 +196,4 @@ tableFilter.method("removeInstance", function(instanceNum){
 	this.host.permahidden = this.permahidden;
 
 });
+//&end [removeInstance]

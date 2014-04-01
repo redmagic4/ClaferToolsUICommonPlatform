@@ -872,6 +872,7 @@ FeatureQualityMatrix.method("removeInstance", function(instanceNum){
     this.settings.onInstanceRemove(this, instanceNum);
 });
 //&end [removeInstance]
+//&begin [expandCollapse]
 FeatureQualityMatrix.method("onFeatureCollapsed", function(feature){
     this.filter.closeFeature(feature);
     this.settings.onFeatureCollapsed(this, feature);
@@ -881,7 +882,7 @@ FeatureQualityMatrix.method("onFeatureExpanded", function(feature){
     this.filter.openFeature(feature);
     this.settings.onFeatureExpanded(this, feature);
 });
-
+//&end [expandCollapse]
 FeatureQualityMatrix.method("clearFilters", function (){
     this.SavedFilters = [];
     this.permahidden = [];

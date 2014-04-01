@@ -6,3 +6,5 @@ instance_processor.js instance_converter.js
 instanceProcessor
 data_table.js table_visualizer.js
 dataTable
+table_filter.js
+contentFilter
