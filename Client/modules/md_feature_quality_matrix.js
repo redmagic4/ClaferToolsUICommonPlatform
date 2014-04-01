@@ -52,7 +52,7 @@ FeatureQualityMatrix.method("onDataLoaded", function(data){
     this.instanceProcessor = new InstanceProcessor(data.instancesXML);
     this.processor = new ClaferProcessor(data.claferXML);
     this.filter = new tableFilter("comparison", data.claferXML, data.instancesXML, this);    
-//    this.filter = new InstanceFilter(this.host)
+    this.clearFilters();
     this.abstractClaferOutput = "";    
     this.toggled = false;
     
@@ -71,7 +71,7 @@ FeatureQualityMatrix.method("onRendered", function()
     $.resizeWindow(this.id, this.width, $("#comparison").height() + 80); // resize the table to fit everything
 	//&end automaticViewSizing
 // Add circles to table headers
-///////////    this.addShapes(); will be enabled later
+    this.addShapes();
 
 // Add search bar 
     var td = $('#comparison .table_title')[0];
