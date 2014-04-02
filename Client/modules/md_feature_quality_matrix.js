@@ -37,14 +37,7 @@ function FeatureQualityMatrix(host, settings)
     this.normalOpacity = "1.0"
 
     this.host = host;
-
-//    this.SavedFilters = [];
-//    this.permahidden = [];
-
     this.host.loaded();
-
-//    this.dataTable.matrix = null;
-//    this.dataTable.
     
 }
 
@@ -211,9 +204,12 @@ FeatureQualityMatrix.method("onRendered", function()
 // Add tristate checkboxes for filtering features
     i = 1;
     row = $("#r" + i);
-    $(row).attr("FilterStatus", "none");
+    
+        
     var that = this;
     while (row.length != 0){
+        // setting the default filtering status to each row - none
+        $(row).attr("FilterStatus", "none");
         if (!row.find(".numeric").length && !row.find(".EffectMan").length){
             $("#r" + i + " .td_abstract").prepend('<image id="r' + i + 'box" src="commons/Client/images/checkbox_empty.bmp">');
             $("#r" + i + "box").click(function(){
@@ -392,8 +388,6 @@ FeatureQualityMatrix.method("getDataTable", function()
     this.traverse(current, 0);
     output = abstractClaferOutput;
     
-
-    var originalPoints = this.host.storage.originalPoints;
     var goalNames = this.processor.getGoals();
     var result = new DataTable();   
     result.title = output[0].displayWithMargins;
@@ -564,33 +558,6 @@ FeatureQualityMatrix.method("scrollToSearch", function (input){
     }
     $('#mdFeatureQualityMatrix .window-content').scroll();
 
-/*  OLD VERSION --Consider for removal
-    if (input == ""){
-        $('#mdFeatureQualityMatrix .window-content').scrollTop(0);
-    }
-    var firstPass = true;
-    var iteratedRow = this.currentRow;
-
-    if (input == this.previousInput){
-        firstPass = false;
-        iteratedRow++;
-    }
-    this.previousInput = input;
-
-    while(iteratedRow != this.currentRow || firstPass){
-        if (iteratedRow >= ($("#tBody tbody").children().length + 1))
-            iteratedRow = 0;
-        else if ($("#tBody #r" + iteratedRow).text().indexOf(input) !== -1){
-            $('#mdFeatureQualityMatrix .window-content').scrollTop(0);
-            $('#mdFeatureQualityMatrix .window-content').scrollTop($("#tBody #r" + iteratedRow).position().top);
-            this.currentRow = iteratedRow;
-            return;
-        }
-        iteratedRow++;
-        firstPass = false;
-    }
-*/
-
 });
 //&end [searchBar]
 //&begin [sorting]
@@ -676,9 +643,3 @@ FeatureQualityMatrix.method("onFeatureExpanded", function(feature){
     this.settings.onFeatureExpanded(this, feature);
 });
 //&end [expandCollapse]
-/*
-FeatureQualityMatrix.method("clearFilters", function (){
-    this.SavedFilters = [];
-    this.permahidden = [];
-});
-*/
