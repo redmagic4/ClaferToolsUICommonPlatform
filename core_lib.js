@@ -172,10 +172,16 @@ var killProcessTree = function(process)
 //&begin checkingDependencies
 var dependencies = [];
 var dependencyCount = 0;
+var dependencyVersions = "";
+
+var getDependencyVersionsText = function(callback)
+{
+    return dependencyVersions;
+};
 
 var addDependency = function(path, args, title)
 {
-    dependencies.push({path : path, args : args, title : title});
+    dependencies.push({path : path, args : args, title : title, id: dependencies.length});
 };
 
 function checkDependency(dependency, callback)
@@ -195,11 +201,12 @@ function checkDependency(dependency, callback)
         tool_version += data;
     });
 
-    tool.on('exit', function (code){    
-        logNormal(tool_version.trim());
+    tool.on('exit', function (code){
+        dependency.tool_version = tool_version.trim();   
+        logNormal(dependency.tool_version);
         if (code == 0)
         {
-            dependency_ok(callback);
+            dependency_ok(dependency, callback);
         }
         else
         {
@@ -220,12 +227,29 @@ var runWithDependencyCheck = function(callback)
     }
 };
 
-var dependency_ok = function(callback)
+var dependency_ok = function(dependency, callback)
 {
     dependencyCount--;
+/*
+    for (var i = 0; i < dependencies.length; i++)
+    {
+        if (dependencies[i].id == dependency.id)
+        {
+            dependencies[i].
+        }
+    }
+*/
     if (dependencyCount == 0)
     {
         logNormal('Dependencies found successfully. Please review their versions manually');        
+
+        dependencyVersions = "";
+
+        for (var i = 0; i < dependencies.length; i++)
+        {
+            dependencyVersions += dependencies[i].tool_version + "\n";
+        }
+
         callback();
     }
 };
@@ -423,3 +447,4 @@ module.exports.filterArgs = filterArgs;
 
 module.exports.getTitle = getTitle;
 module.exports.getVersion = getVersion;
+module.exports.getDependencyVersionsText = getDependencyVersionsText;

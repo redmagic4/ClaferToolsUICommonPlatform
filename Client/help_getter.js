@@ -2,12 +2,15 @@ function helpGetter(host){
 	this.host = host;
 }
 
-helpGetter.method("getInitial", function (){
+helpGetter.method("getInitial", function (title, version){
 	var content = '<div class="fadeOverlay"></div>';
 	content += '<div id="help" class="help" style="top:50px; left:100px;">';
-	content += '<iframe id="helpContainer" name="helpContainer" class="help" src="/Client/help_pages/intro.html">';
+	content += '<iframe id="helpContainer" name="helpContainer" class="help" src="/Client/help_pages/intro.html?title=' + title + '&version=' + version + '">';
 	content += '</iframe></div>';
-	content += '<form id="helpForm" target="helpContainer" method="get"><form>';
+	content += '<form id="helpForm" target="helpContainer" method="get">';
+	content += '<input type="hidden" name="title" value="' + title + '"/>';
+	content += '<input type="hidden" name="version" value="' + version + '"/>';
+	content += '</form>';
 	return $(content);
 });
 
@@ -24,7 +27,7 @@ helpGetter.method("setListeners", function(){
 });
 
 helpGetter.method("getHelp", function (moduleName){
-	$("#helpForm").attr("action", "/Client/help_pages/" + moduleName + ".html")
+	$("#helpForm").attr("action", "/Client/help_pages/" + moduleName + ".html");
     $("#helpForm").submit();
     $("#help").show(500);
     $(".fadeOverlay").show(500);

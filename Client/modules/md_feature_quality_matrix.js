@@ -43,7 +43,7 @@ function FeatureQualityMatrix(host, settings)
 
 FeatureQualityMatrix.method("onDataLoaded", function(data){
     this.instanceProcessor = new InstanceProcessor(data.instancesXML);
-    this.processor = new ClaferProcessor(data.claferXML);
+    this.processor = new ClaferProcessor(data.claferXML, data.qualities);
     this.filter = new tableFilter("comparison", data.claferXML, data.instancesXML, this);    
 //    this.clearFilters();
     this.abstractClaferOutput = "";    
@@ -240,8 +240,8 @@ FeatureQualityMatrix.method("onRendered", function()
     }
   //&begin [expandCollapse]
     //  Add collapse buttons for features with children
-    var instanceSuperClafer = this.instanceProcessor.getInstanceSuperClafer();
-    var abstractClaferTree = this.processor.getAbstractClaferTree("/module/declaration/uniqueid", instanceSuperClafer);
+    var instanceName = this.instanceProcessor.getInstanceName();
+    var abstractClaferTree = this.processor.getAbstractClaferTree("/module/declaration/uniqueid", instanceName);
     var hasChild = this.processor.getFeaturesWithChildren(abstractClaferTree)
     i = 1;
     row = $("#r" + i);
@@ -308,16 +308,20 @@ FeatureQualityMatrix.method("onRendered", function()
     }).css("cursor", "pointer");
   //&end [sortingByID,sorting]
 // Selection of instances for analysis from top row of table
-    var length = $("#r0").find(".td_instance").length;
-    for(i=1; i<=length; i++){
-        $("#th0_" + i).click(function(){
-            var pid = getPID($(this).attr('id').substring(4))
-            var locationInArray = $.inArray(pid, that.settings.getSelection(that));
-            if (locationInArray == -1)
-                that.settings.onSelected(that,pid);
-            else
-                that.settings.onDeselected(that,pid);
-        }).css("cursor", "pointer");
+
+    if (this.settings.instancesSelectable) // can select instances
+    {
+        var length = $("#r0").find(".td_instance").length;
+        for(i=1; i<=length; i++){
+            $("#th0_" + i).click(function(){
+                var pid = getPID($(this).attr('id').substring(4))
+                var locationInArray = $.inArray(pid, that.settings.getSelection(that));
+                if (locationInArray == -1)
+                    that.settings.onSelected(that,pid);
+                else
+                    that.settings.onDeselected(that,pid);
+            }).css("cursor", "pointer");
+        }
     }
 
 // add handler to search bar
@@ -377,9 +381,9 @@ FeatureQualityMatrix.method("traverse", function(clafer, level)
 FeatureQualityMatrix.method("getDataTable", function()
 {
     var instanceCount = this.instanceProcessor.getInstanceCount();
-    var instanceSuperClafer = this.instanceProcessor.getInstanceSuperClafer();
-    var abstractClaferTree = this.processor.getAbstractClaferTree("/module/declaration/uniqueid", instanceSuperClafer);
-    var EMfeatures = this.processor.getEffectivelyMandatoryFeatures(abstractClaferTree)
+    var instanceName = this.instanceProcessor.getInstanceName();
+    var abstractClaferTree = this.processor.getAbstractClaferTree("/module/declaration/uniqueid", instanceName);
+    var EMfeatures = this.processor.getEffectivelyMandatoryFeatures(abstractClaferTree);
     
     var parent = null;
     var current = abstractClaferTree;
