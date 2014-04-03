@@ -88,6 +88,12 @@ Input.method("onInitRendered", function()
 
     $('#myform').ajaxForm(options); 
 
+    if (this.settings.optimization_backend)
+    {
+       $("#optimizationBackend")[0].onchange = this.onBackendChange.bind(this);    
+    }
+
+
 //    var options = new Object();
 //    options.error = this.handleError.bind(this);
 //    options.timeout = this.requestTimeout;
@@ -327,14 +333,14 @@ Input.method("getInitContent", function()
 
     result += '<table width="100%" height="100%" cellspacing="0" cellpadding="0">';    
     result += '<tr height="1em">';
-    result += '<td><input type="file" size="20" name="claferFile" id="claferFile" title="If you want to upload your clafer file, select one here "/></td>';
+    result += '<td><div style="width:100%"><input type="file" style="width:100%" name="claferFile" id="claferFile" title="If you want to upload your clafer file, select one here "/></div></td>';
 	//&begin selectionOfExamples
     result += '<td width="60"><input id="submitFile" type="submit" value="' + this.settings.file_extensions[0].button_file_caption + '" title="' + this.settings.file_extensions[0].button_file_tooltip + '"/></td>';
     result += '<td width="160"><input id="loadExampleInEditor" type="checkbox" name="loadExampleInEditor" value="unchecked" title="If checked, the editor window below will be loaded with a file or an example submitted">Load into editor</input></td>';
     result += '</tr><tr height="1em">';
-    result += '<td><select id="exampleURL" style="width:220px" name="exampleURL" title="If you want, you can choose to compile an example clafer model from the list">';   
+    result += '<td><div style="width:100%"><select id="exampleURL" style="width:100%" name="exampleURL" title="If you want, you can choose to compile an example clafer model from the list">';   
     
-    result += '</select></td>';
+    result += '</select></div></td>';
     result += '<td><input id="submitExample" type="submit" value="' + this.settings.file_extensions[0].button_example_caption + '" title="' + this.settings.file_extensions[0].button_example_tooltip + '"></input></td>';
 	//&end selectionOfExamples
     result += '<td></td>';
@@ -372,12 +378,23 @@ Input.method("getInitContent", function()
 
     if (this.settings.optimization_backend)
     {
-        result += '<div id="input_bottom_container" style="position:absolute;bottom:0; left:0;right:0;margin-bottom:-20px;">';
-        result += '<div style="height:2px; border-top: 2px groove threedface;"></div>';
+        result += '<div id="input_bottom_container" style="position:absolute;bottom:0; left:0;right:0;margin-bottom:-20px; border: 2px groove threedface;">';
+//        result += '<div style="height:2px; border-top: 2px groove threedface;"></div>';
 
-        result += '<span id="input_backend_label">Optimization backend: </span><select id="optimizationBackend" style="width:180px" name="optimizationBackend" title=""></select>';
+        result += '<table width="100%" height="100%" cellspacing="0" cellpadding="0"><tr><td>';
+        result += '<span id="input_backend_label">Backend: </span><select id="optimizationBackend" style="width:180px" name="optimizationBackend" title=""></select>';
 
+        result += '</td><td>';
+
+        result += '<span id="optimizationIntScopeSettings">';
+        result += '<span style="padding-left:4px;padding-right:4px;">Max. Integers:</span>';
+        result += '<input type="text" class="scopeInput" size="2" value="127" id="optimizationIntHighScopeValue" title="Enter the upper bound for unknown integers" name="optimizationIntHighScopeValue"/>';
+        result += '</span>';
+        result += '</td>';        
+
+        result += '<td width="160">';
         result += '<input id="useCache" type="checkbox" name="useCache" checked="' + this.settings.input_default_cache + '">Use Cache</input>';
+        result += '</td></tr></table>';
 
         result += '</div>';
 
@@ -385,6 +402,7 @@ Input.method("getInitContent", function()
             function(data)
             {
                 var backends = data.backends;
+                context.backends = data.backends;                
                 var options = "";
 
                 var display = "block";
@@ -396,6 +414,7 @@ Input.method("getInitContent", function()
 
                 $("#optimizationBackend").html(options);
 
+                context.onBackendChange();
                 context.partLoaded();
             }
         ).error(function() 
@@ -477,3 +496,33 @@ function unescapeJSON(escaped)
         .replaceAll('\\r', '\r')
         .replaceAll('\\t', '\t');                  
 }
+
+Input.method("onBackendChange", function()
+{
+    var selectedId = $( "#optimizationBackend option:selected" ).val();
+    var found = false;
+
+    for (var i = 0; i < this.backends.length; i++)
+    {
+        if (this.backends[i].id == selectedId)
+        {
+            if (this.backends[i].scope_options.set_int_scope)
+            {
+                $("#optimizationIntScopeSettings").show();
+                if (this.backends[i].scope_options.set_int_scope.default_value)
+                {
+                    $("#optimizationIntHighScopeValue").val(this.backends[i].scope_options.set_int_scope.default_value);
+                }
+
+                found = true;
+            }
+            else
+            {
+                $("#optimizationIntScopeSettings").hide();                
+            }           
+        }
+    }
+
+    if (this.settings.onBackendChange) 
+        this.settings.onBackendChange(this, result);
+});
