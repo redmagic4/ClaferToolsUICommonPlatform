@@ -360,7 +360,7 @@ var runClaferCompiler = function(key, specifiedArgs, genericArgs, onComplete)
 };
 //&end [fileProcessing]
 //&end fileUpload
-//&begin [control]
+//&begin [handleControlRequest]
 var handleControlRequest = function(req, res, settings){
 
     core.logSpecific("Control: Enter", req.body.windowKey);
@@ -802,7 +802,7 @@ var handleControlRequest = function(req, res, settings){
     return true;
 
 };
-//&end [control]
+//&end [handleControlRequest]
 module.exports.handleUploads = handleUploads;
 module.exports.getMainHTML = getMainHTML;
 module.exports.runClaferCompiler = runClaferCompiler;
