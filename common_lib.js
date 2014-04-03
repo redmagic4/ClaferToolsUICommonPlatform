@@ -360,6 +360,7 @@ var runClaferCompiler = function(key, specifiedArgs, genericArgs, onComplete)
 };
 //&end [fileProcessing]
 //&end fileUpload
+//&begin [control]
 var handleControlRequest = function(req, res){
 
     core.logSpecific("Control: Enter", req.body.windowKey);
@@ -481,7 +482,7 @@ var handleControlRequest = function(req, res){
                 }                
             });
 
-
+          //&begin [scopeInteraction]
             // if the backend supports production of the scope file, then send this command
             // the command will be handled after the initial processing in any case
 
@@ -498,7 +499,7 @@ var handleControlRequest = function(req, res){
 
             res.writeHead(200, { "Content-Type": "text/html"});
             res.end("started");
-
+          //&end [scopeInteraction]
         }
     }
     else if (req.body.operation == "stop") // "Stop" operation
@@ -509,6 +510,7 @@ var handleControlRequest = function(req, res){
         res.writeHead(200, { "Content-Type": "text/html"});
         res.end("stopped");
     }
+  //&begin [scopeInteraction]
     else if (req.body.operation == "setDefaultScope") // "Set Global Scope" operation
     {
         core.logSpecific("Control: setDefaultScope", req.body.windowKey);
@@ -716,6 +718,7 @@ var handleControlRequest = function(req, res){
         res.writeHead(200, { "Content-Type": "text/html"});
         res.end("int_scope_set");
     }
+  //&end [scopeInteraction]
     else if (req.body.operation == "setBitwidth") // "Set Bitwidth" operation
     {
         core.logSpecific("Control: setBitwidth", req.body.windowKey);
@@ -812,7 +815,7 @@ var handleControlRequest = function(req, res){
     }
 
 };
-
+//&end [control]
 module.exports.handleUploads = handleUploads;
 module.exports.getMainHTML = getMainHTML;
 module.exports.runClaferCompiler = runClaferCompiler;
