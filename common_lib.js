@@ -361,6 +361,20 @@ var runClaferCompiler = function(key, specifiedArgs, genericArgs, onComplete)
 //&end [fileProcessing]
 //&end fileUpload
 //&begin [handleControlRequest]
+//&begin [scopeInteraction]
+var produceScopes = function(process, backend)
+{
+    if (backend.scope_options.produce_scope_file)
+    {
+        process.tool.stdin.write(backend.scope_options.produce_scope_file.command);
+        process.producedScopes = false;
+    }
+    else
+    {
+        process.producedScopes = true;
+    }
+};
+//&end [scopeInteraction]
 var handleControlRequest = function(req, res, settings){
 
     core.logSpecific("Control: Enter", req.body.windowKey);
@@ -453,6 +467,9 @@ var handleControlRequest = function(req, res, settings){
             core.logSpecific(args, req.body.windowKey);
             process.ig_args = toolPath.replace(ROOT, "") + " " + args.join(" ").replace(process.file, "file").replace(ROOT, "");
             
+            process.ig_just_started = true;
+            process.producedScopes = true;
+
             process.tool = spawn(toolPath, args);
 
             process.tool.on('error', function (err){
@@ -467,11 +484,11 @@ var handleControlRequest = function(req, res, settings){
             });
 
             process.tool.stdout.on("data", function(data) {
-                settings.onData(data);
+                settings.onData(data, backend);
             });
 
             process.tool.stderr.on("data", function(data) {
-                settings.onError(data);
+                settings.onError(data, backend);
             });
 
             process.tool.on("close", function (code)
@@ -483,21 +500,6 @@ var handleControlRequest = function(req, res, settings){
                     process.tool = null;
                 }                
             });
-
-          //&begin [scopeInteraction]
-            // if the backend supports production of the scope file, then send this command
-            // the command will be handled after the initial processing in any case
-
-
-            if (backend.scope_options.produce_scope_file)
-            {
-                process.tool.stdin.write(backend.scope_options.produce_scope_file.command);
-                process.producedScopes = false;
-            }
-            else
-            {
-                process.producedScopes = true;
-            }
 
             res.writeHead(200, { "Content-Type": "text/html"});
             res.end("started");
@@ -538,16 +540,7 @@ var handleControlRequest = function(req, res, settings){
 
         var command = core.replaceTemplate(backend.scope_options.set_default_scope.command, replacements);
         process.tool.stdin.write(command);
-            
-        if (backend.scope_options.produce_scope_file)
-        {
-            process.tool.stdin.write(backend.scope_options.produce_scope_file.command);
-            process.producedScopes = false;
-        }
-        else
-        {
-            process.producedScopes = true;
-        }
+        produceScopes(process, backend);
 
         res.writeHead(200, { "Content-Type": "text/html"});
         res.end("default_scope_set");
@@ -577,16 +570,7 @@ var handleControlRequest = function(req, res, settings){
 
         var command = core.replaceTemplate(backend.scope_options.inc_all_scopes.command, replacements);
         process.tool.stdin.write(command);
-            
-        if (backend.scope_options.produce_scope_file)
-        {
-            process.tool.stdin.write(backend.scope_options.produce_scope_file.command);
-            process.producedScopes = false;
-        }
-        else
-        {
-            process.producedScopes = true;
-        }
+        produceScopes(process, backend);
 
         res.writeHead(200, { "Content-Type": "text/html"});
         res.end("all_scopes_increased");
@@ -620,16 +604,7 @@ var handleControlRequest = function(req, res, settings){
 
         var command = core.replaceTemplate(backend.scope_options.set_individual_scope.command, replacements);
         process.tool.stdin.write(command);
-            
-        if (backend.scope_options.produce_scope_file)
-        {
-            process.tool.stdin.write(backend.scope_options.produce_scope_file.command);
-            process.producedScopes = false;
-        }
-        else
-        {
-            process.producedScopes = true;
-        }
+        produceScopes(process, backend);
 
         res.writeHead(200, { "Content-Type": "text/html"});
         res.end("individual_scope_set");
@@ -663,16 +638,7 @@ var handleControlRequest = function(req, res, settings){
 
         var command = core.replaceTemplate(backend.scope_options.inc_individual_scope.command, replacements);
         process.tool.stdin.write(command);
-            
-        if (backend.scope_options.produce_scope_file)
-        {
-            process.tool.stdin.write(backend.scope_options.produce_scope_file.command);
-            process.producedScopes = false;
-        }
-        else
-        {
-            process.producedScopes = true;
-        }
+        produceScopes(process, backend);
 
         res.writeHead(200, { "Content-Type": "text/html"});
         res.end("individual_scope_increased");
@@ -702,16 +668,7 @@ var handleControlRequest = function(req, res, settings){
 
         var command = core.replaceTemplate(backend.scope_options.set_int_scope.command, replacements);
         process.tool.stdin.write(command);
-            
-        if (backend.scope_options.produce_scope_file)
-        {
-            process.tool.stdin.write(backend.scope_options.produce_scope_file.command);
-            process.producedScopes = false;
-        }
-        else
-        {
-            process.producedScopes = true;
-        }
+        produceScopes(process, backend);
 
         res.writeHead(200, { "Content-Type": "text/html"});
         res.end("int_scope_set");
@@ -822,3 +779,4 @@ module.exports.handleUploads = handleUploads;
 module.exports.getMainHTML = getMainHTML;
 module.exports.runClaferCompiler = runClaferCompiler;
 module.exports.handleControlRequest = handleControlRequest;
+module.exports.produceScopes = produceScopes;
