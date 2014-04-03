@@ -361,7 +361,7 @@ var runClaferCompiler = function(key, specifiedArgs, genericArgs, onComplete)
 //&end [fileProcessing]
 //&end fileUpload
 //&begin [control]
-var handleControlRequest = function(req, res){
+var handleControlRequest = function(req, res, settings){
 
     core.logSpecific("Control: Enter", req.body.windowKey);
 
@@ -443,33 +443,18 @@ var handleControlRequest = function(req, res){
                 var process = core.getProcess(req.body.windowKey);
                 if (process != null)
                 {
-                    process.result = '{"message": "' + lib.escapeJSON("Error: Cannot run claferIG") + '"}';
+                    process.result = '{"message": "' + lib.escapeJSON("Error: Cannot run instance generator") + '"}';
                     process.completed = true;
                     process.tool = null;
                 }
             });
 
-            process.tool.stdout.on("data", function (data)
-            {
-                var process = core.getProcess(req.body.windowKey);
-                if (process != null)
-                {
-                    if (!process.completed)
-                    {
-                        process.freshData += data;
-                    }
-                }
+            process.tool.stdout.on("data", function(data) {
+                settings.onData(data);
             });
 
-            process.tool.stderr.on("data", function (data)
-            {
-                var process = core.getProcess(req.body.windowKey);
-                if (process != null)
-                {
-                    if (!process.completed){
-                        process.freshError += data;
-                    }
-                }
+            process.tool.stderr.on("data", function(data) {
+                settings.onError(data);
             });
 
             process.tool.on("close", function (code)

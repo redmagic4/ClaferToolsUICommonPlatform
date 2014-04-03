@@ -240,9 +240,21 @@ FeatureQualityMatrix.method("onRendered", function()
     }
   //&begin [expandCollapse]
     //  Add collapse buttons for features with children
-    var instanceName = this.instanceProcessor.getInstanceName();
-    var abstractClaferTree = this.processor.getAbstractClaferTree("/module/declaration/uniqueid", instanceName);
-    var hasChild = this.processor.getFeaturesWithChildren(abstractClaferTree)
+
+    var abstractClaferTree = null;
+
+    if (this.settings.useInstanceName)
+    {
+        var instanceName = this.instanceProcessor.getInstanceName();
+        abstractClaferTree = this.processor.getAbstractClaferTree("/module/declaration/uniqueid", instanceName, {"includeSupers": "true"});
+    }
+    else
+    {
+        var instanceSuperClafer = this.instanceProcessor.getInstanceSuperClafer();
+        abstractClaferTree = this.processor.getAbstractClaferTree("/module/declaration/uniqueid", instanceSuperClafer, {"includeSupers": "false"});        
+    }
+
+    var hasChild = this.processor.getFeaturesWithChildren(abstractClaferTree);
     i = 1;
     row = $("#r" + i);
     var that = this;
@@ -381,8 +393,20 @@ FeatureQualityMatrix.method("traverse", function(clafer, level)
 FeatureQualityMatrix.method("getDataTable", function()
 {
     var instanceCount = this.instanceProcessor.getInstanceCount();
-    var instanceName = this.instanceProcessor.getInstanceName();
-    var abstractClaferTree = this.processor.getAbstractClaferTree("/module/declaration/uniqueid", instanceName);
+
+    var abstractClaferTree = null;
+
+    if (this.settings.useInstanceName)
+    {
+        var instanceName = this.instanceProcessor.getInstanceName();
+        abstractClaferTree = this.processor.getAbstractClaferTree("/module/declaration/uniqueid", instanceName, {"includeSupers": "true"});
+    }
+    else
+    {
+        var instanceSuperClafer = this.instanceProcessor.getInstanceSuperClafer();
+        abstractClaferTree = this.processor.getAbstractClaferTree("/module/declaration/uniqueid", instanceSuperClafer, {"includeSupers": "false"});        
+    }
+
     var EMfeatures = this.processor.getEffectivelyMandatoryFeatures(abstractClaferTree);
     
     var parent = null;
